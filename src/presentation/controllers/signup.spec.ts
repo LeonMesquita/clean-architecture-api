@@ -93,6 +93,22 @@ describe('SignUp Controller', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
+  test('Should call EmailValidator with correct email', () => {
+    const { sut, emailValidatorStup } = makeSut()
+    // O emailValidator sempre retorna true, mas esse teste em específico precisa que ele retorne false
+    // Pra fazer isso, é só mockar o metodo isValid e retornar false usando o spyOn
+    const isValidSpy = jest.spyOn(emailValidatorStup, 'isValid').mockReturnValueOnce(false)
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+    sut.handle(httpRequest)
+    expect(isValidSpy).toHaveBeenCalledWith('any_email@mail.com')
+  })
 })
 
 // Primeiro commitar sempre o arquivo de produção e depois o de teste
